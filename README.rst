@@ -1,8 +1,8 @@
 ======================
-seqdiag-gui user guide
+seqdiag_gui user guide
 ======================
 
-seqdiag-gui is a graphic user interface to Takeshi Komiya's simple sequence
+seqdiag_gui is a graphic user interface to Takeshi Komiya's simple sequence
 diagram package, called seqdiag_
 
 .. _seqdiag: https://bitbucket.org/tk0miya/seqdiag
