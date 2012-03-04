@@ -1,0 +1,14 @@
+# Buildout generated directories
+/bin/
+/eggs/
+/parts/
+/develop-eggs/
+/.installed.cfg
+/src/seqdiag_gui.egg-info/
+
+# Python compiled files
+*.pyc
+
+# Editor support files
+*.swp
+*.swo
