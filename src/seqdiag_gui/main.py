@@ -1,25 +1,43 @@
 import wx
 import seqdiag
 import os.path
+from seqdiag import diagparser
+from seqdiag.DiagramDraw import DiagramDraw
+from seqdiag.builder import ScreenNodeBuilder
+
+fmt = 'PNG'
+antialias = False
+fontpath = None
 
 class SeqdiagImage():
 
     def text2diagram(self, text):
-        tree = parser.parse_string(text)
+        try:
+            tree = diagparser.parse_string(text)
+        except diagparser.ParseException:
+            print 'Text edition does not evaluate to a valid seqdiagram'
+            return None
         return ScreenNodeBuilder.build(tree)
 
-    def diagram2png(self, diagram):
-        pass
+    def diagram2png(self, diagram, filename):
+        drawer = DiagramDraw(fmt, diagram, filename, 
+                             font=fontpath, antialias=antialias)
+        drawer.draw()
+        drawer.save()
 
 class MainWindow(wx.Frame):
+
     def __init__(self, filename='simple.diag', imgfile='simple.png'):
         super(MainWindow, self).__init__(None, size=wx.DefaultSize) #(400,200))
         self.filename = filename
         self.imgfile = imgfile
         self.dirname = '.'
+        self.seqdiagimg = SeqdiagImage()
+
         p = wx.Panel(self, -1)
         self.CreateInteriorWindowComponents(p)
         self.CreateExteriorWindowComponents()
+
         self.sizer = self.__arrange_boxes()
         p.SetSizer(self.sizer)
         self.sizer.Fit(p)
@@ -36,6 +54,7 @@ class MainWindow(wx.Frame):
         and menu bars.'''
         self.control = wx.TextCtrl(panel, -1, open(self.filename, 'r').read(),
                                    style=wx.TE_MULTILINE)
+        self.Bind(wx.EVT_TEXT, self.OnEdit, self.control)
         png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
         self.img = wx.StaticBitmap(panel, -1, png,
                                    (png.GetWidth(), png.GetHeight()))
@@ -100,6 +119,14 @@ class MainWindow(wx.Frame):
 
     def OnExit(self, event):
         self.Close()  # Close the main window.
+
+    def OnEdit(self, event):
+        diagram_tree = self.seqdiagimg.text2diagram(event.GetString())
+        if diagram_tree:
+            self.seqdiagimg.diagram2png(diagram_tree, self.imgfile)
+            png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+            self.img.SetBitmap(png)
+            print 'EvtText: %s\n' % event.GetString()
 
     def OnSave(self, event):
         textfile = open(os.path.join(self.dirname, self.filename), 'w')
