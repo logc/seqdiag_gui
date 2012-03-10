@@ -45,3 +45,8 @@ Un-install
 ==========
 
 TODO
+
+LICENSE
+=======
+
+TBD
