@@ -12,3 +12,6 @@
 # Editor support files
 *.swp
 *.swo
+
+# Backup files
+*.bk
