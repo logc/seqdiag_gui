@@ -20,7 +20,7 @@ If you are on OS X, you can install these packages via Macports::
   $ sudo port install python27 @2.7.2_4+universal
   $ sudo port install py27-wxpython-devel @2.9.3.1_0
 
-This project has been tested on a system running OS X 10.6.8
+This project has been tested on a system running OS X 10.8.2
 
 Setup
 =====

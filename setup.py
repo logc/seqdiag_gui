@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(name='seqdiag_gui',
       version='0.1a1',
-      description='',
+      description='A graphical user interface to the seqdiag package',
       author='Luis Osa',
       author_email='luis.osa.gdc@gmail.com',
       url='https://github.com/logc/seqdiag_gui',

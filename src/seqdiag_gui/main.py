@@ -5,6 +5,8 @@ main is the entry point of this application.
 """
 import wx
 import os.path
+import cStringIO
+
 from seqdiag import diagparser
 from seqdiag.DiagramDraw import DiagramDraw
 from seqdiag.builder import ScreenNodeBuilder
@@ -23,12 +25,15 @@ def text2diagram(text):
         return None
     return ScreenNodeBuilder.build(tree)
 
-def diagram2png(diagram, filename):
+def diagram2png(diagram):
     """Converts an abstract diagram into a representable image"""
-    drawer = DiagramDraw(FORMAT, diagram, filename, 
-                         font=FONTPATH, antialias=ANTIALIAS)
+    drawer = DiagramDraw(FORMAT, diagram,
+                         font=FONTPATH,
+                         antialias=ANTIALIAS,
+                         transparency=True)
     drawer.draw()
-    drawer.save()
+    img = drawer.save()
+    return img
 
 class MainWindow(wx.Frame):
     """
@@ -42,6 +47,8 @@ class MainWindow(wx.Frame):
         self.filename = filename
         self.imgfile = imgfile
         self.dirname = '.'
+        self.height = 0
+        self.width = 0
 
         panel = wx.Panel(self, -1)
         self.control = None
@@ -63,15 +70,17 @@ class MainWindow(wx.Frame):
         return box
 
     def create_interior_widgets(self, panel):
-        """Creates interior window components, that is everythina except status
+        """Creates interior window components, i.e. everything except status
         and menu bars."""
         fileh = open(self.filename, 'r')
         self.control = wx.TextCtrl(panel, -1, fileh.read(),
                                    style=wx.TE_MULTILINE)
         self.Bind(wx.EVT_TEXT, self.on_edit, self.control)
         png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        self.width = png.GetWidth()
+        self.height = png.GetHeight()
         self.img = wx.StaticBitmap(panel, -1, png,
-                                   (png.GetWidth(), png.GetHeight()))
+                                   (self.width, self.height))
 
     def create_exterior_widgets(self):
         """Creates exterior window components, such as menu and status bar."""
@@ -146,10 +155,10 @@ class MainWindow(wx.Frame):
         """Evaluates the entered text at each edition"""
         diagram_tree = text2diagram(event.GetString())
         if diagram_tree:
-            diagram2png(diagram_tree, self.imgfile)
-            png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-            self.img.SetBitmap(png)
-            print 'EvtText: %s\n' % event.GetString()
+            img = diagram2png(diagram_tree)
+            stream = wx.InputStream(cStringIO.StringIO(img)) 
+            png = wx.ImageFromStream(stream)
+            self.img.SetBitmap(png.ConvertToBitmap())
 
     def on_save(self, event):
         """Saves the output graph to a file"""
@@ -180,4 +189,3 @@ def run():
     frame = MainWindow()
     frame.Show()
     app.MainLoop()
-
