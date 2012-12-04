@@ -161,6 +161,8 @@ class MainWindow(wx.Frame):
             png = wx.ImageFromStream(stream)
             self.img.SetBitmap(png.ConvertToBitmap())
         else:
+            ## the colour is named 'tomato3' on 
+            ## http://web.njit.edu/~kevin/rgb.txt.html
             self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
             self.img.Refresh()
 
