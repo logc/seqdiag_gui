@@ -155,10 +155,14 @@ class MainWindow(wx.Frame):
         """Evaluates the entered text at each edition"""
         diagram_tree = text2diagram(event.GetString())
         if diagram_tree:
+            self.img.SetBackgroundColour(wx.NullColour)
             img = diagram2png(diagram_tree)
             stream = wx.InputStream(cStringIO.StringIO(img)) 
             png = wx.ImageFromStream(stream)
             self.img.SetBitmap(png.ConvertToBitmap())
+        else:
+            self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
+            self.img.Refresh()
 
     def on_save(self, event):
         """Saves the output graph to a file"""
