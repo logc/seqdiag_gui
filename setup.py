@@ -16,5 +16,4 @@ setup(name='seqdiag_gui',
               'run=seqdiag_gui.main:run',
               ]
           }
-          
       )

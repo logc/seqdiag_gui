@@ -7,8 +7,8 @@ import wx
 import os.path
 import cStringIO
 
-from seqdiag import diagparser
-from seqdiag.DiagramDraw import DiagramDraw
+from seqdiag import parser
+from seqdiag.drawer import DiagramDraw
 from seqdiag.builder import ScreenNodeBuilder
 
 FORMAT = 'PNG'
@@ -19,8 +19,8 @@ def text2diagram(text):
     """Converts a text to an abstract diagram, which is not yet a
     representable image"""
     try:
-        tree = diagparser.parse_string(text)
-    except diagparser.ParseException:
+        tree = parser.parse_string(text)
+    except parser.ParseException:
         print 'Text edition does not evaluate to a valid seqdiagram'
         return None
     return ScreenNodeBuilder.build(tree)
