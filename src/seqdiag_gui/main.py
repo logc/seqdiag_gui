@@ -49,6 +49,7 @@ class MainWindow(wx.Frame):
         self.dirname = '.'
         self.height = 0
         self.width = 0
+        self.already_saved = False
 
         panel = wx.Panel(self, -1)
         self.control = None
@@ -66,6 +67,12 @@ class MainWindow(wx.Frame):
         vertical stack"""
         box = wx.BoxSizer(wx.VERTICAL)
         box.Add(self.img, 0, wx.EXPAND)
+        buttons = wx.BoxSizer(wx.HORIZONTAL)
+        buttons.AddStretchSpacer()
+        buttons.Add(self.save_button, 0, wx.ALIGN_LEFT)
+        buttons.Add(self.eval_button, 0, wx.ALIGN_RIGHT)
+        buttons.AddStretchSpacer()
+        box.Add(buttons, 0, wx.EXPAND)
         box.Add(self.control, 0, wx.EXPAND)
         return box
 
@@ -81,6 +88,9 @@ class MainWindow(wx.Frame):
         self.height = png.GetHeight()
         self.img = wx.StaticBitmap(panel, -1, png,
                                    (self.width, self.height))
+        self.save_button = wx.Button(panel, wx.ID_SAVE)
+        self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
+        self.eval_button = wx.Button(panel, label='Evaluate')
 
     def create_exterior_widgets(self):
         """Creates exterior window components, such as menu and status bar."""
@@ -118,7 +128,7 @@ class MainWindow(wx.Frame):
     def default_file_dialog_options(self):
         """Returns a dictionary with file dialog options that can be
         used in both the save file dialog as well as in the open file
-        dialog. """ 
+        dialog. """
         return dict(message='Choose a file', defaultDir=self.dirname,
                     wildcard='*.*')
 
@@ -157,7 +167,7 @@ class MainWindow(wx.Frame):
         if diagram_tree:
             self.img.SetBackgroundColour(wx.NullColour)
             img = diagram2png(diagram_tree)
-            stream = wx.InputStream(cStringIO.StringIO(img)) 
+            stream = wx.InputStream(cStringIO.StringIO(img))
             png = wx.ImageFromStream(stream)
             self.img.SetBitmap(png.ConvertToBitmap())
         else:
@@ -166,12 +176,26 @@ class MainWindow(wx.Frame):
             self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
             self.img.Refresh()
 
+    def on_save_button(self, event):
+        if not self.already_saved:
+            self.already_saved = True
+            self.on_save_as(event)
+        else:
+            self.on_save(event)
+
+    def on_save_as(self, event):
+        """Saves the output graph to a file, whose filename must be provided by
+        the user"""
+        if self.ask_user_for_filename(defaultFile=self.imgfile, style=wx.SAVE,
+                                      **self.default_file_dialog_options()):
+            self.on_save(event)
+
     def on_save(self, event):
         """Saves the output graph to a file"""
         del event
-        textfile = open(os.path.join(self.dirname, self.filename), 'w')
-        textfile.write(self.control.GetValue())
-        textfile.close()
+        self.img.GetBitmap().ConvertToImage().SaveFile(
+                os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
+
 
     def on_open(self, event):
         """Opens a text file to edit"""
@@ -181,13 +205,6 @@ class MainWindow(wx.Frame):
             textfile = open(os.path.join(self.dirname, self.filename), 'r')
             self.control.SetValue(textfile.read())
             textfile.close()
-
-    def on_save_as(self, event):
-        """Saves the output graph to a file, whose filename must be provided by
-        the user"""
-        if self.ask_user_for_filename(defaultFile=self.filename, style=wx.SAVE,
-                                   **self.default_file_dialog_options()):
-            self.on_save(event)
 
 def run():
     """Application entry point"""
