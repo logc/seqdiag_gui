@@ -82,7 +82,6 @@ class MainWindow(wx.Frame):
         fileh = open(self.filename, 'r')
         self.control = wx.TextCtrl(panel, -1, fileh.read(),
                                    style=wx.TE_MULTILINE)
-        self.Bind(wx.EVT_TEXT, self.on_edit, self.control)
         png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
         self.width = png.GetWidth()
         self.height = png.GetHeight()
@@ -91,6 +90,7 @@ class MainWindow(wx.Frame):
         self.save_button = wx.Button(panel, wx.ID_SAVE)
         self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
         self.eval_button = wx.Button(panel, label='Evaluate')
+        self.Bind(wx.EVT_BUTTON, self.on_edit, self.eval_button)
 
     def create_exterior_widgets(self):
         """Creates exterior window components, such as menu and status bar."""
@@ -114,7 +114,6 @@ class MainWindow(wx.Frame):
             else:
                 item = file_menu.Append(item_id, label, help_text)
                 self.Bind(wx.EVT_MENU, handler, item)
-
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, '&File') # Add the file_menu to the MenuBar
         self.SetMenuBar(menu_bar)  # Add the menu_bar to the Frame
@@ -163,7 +162,8 @@ class MainWindow(wx.Frame):
 
     def on_edit(self, event):
         """Evaluates the entered text at each edition"""
-        diagram_tree = text2diagram(event.GetString())
+        del event
+        diagram_tree = text2diagram(self.control.GetValue())
         if diagram_tree:
             self.img.SetBackgroundColour(wx.NullColour)
             img = diagram2png(diagram_tree)
@@ -178,7 +178,6 @@ class MainWindow(wx.Frame):
 
     def on_save_button(self, event):
         if not self.already_saved:
-            self.already_saved = True
             self.on_save_as(event)
         else:
             self.on_save(event)
@@ -195,6 +194,8 @@ class MainWindow(wx.Frame):
         del event
         self.img.GetBitmap().ConvertToImage().SaveFile(
                 os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
+        if not self.already_saved:
+            self.already_saved = True
 
 
     def on_open(self, event):
