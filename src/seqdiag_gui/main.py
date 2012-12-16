@@ -21,7 +21,6 @@ def text2diagram(text):
     try:
         tree = parser.parse_string(text)
     except parser.ParseException:
-        print 'Text edition does not evaluate to a valid seqdiagram'
         return None
     return ScreenNodeBuilder.build(tree)
 
@@ -52,6 +51,9 @@ class MainWindow(wx.Frame):
         self.already_saved = False
 
         panel = wx.Panel(self, -1)
+        self.status_bar = None
+        self.save_button = None
+        self.eval_button = None
         self.control = None
         self.img = None
         self.create_interior_widgets(panel)
@@ -73,7 +75,7 @@ class MainWindow(wx.Frame):
         buttons.Add(self.eval_button, 0, wx.ALIGN_RIGHT)
         buttons.AddStretchSpacer()
         box.Add(buttons, 0, wx.EXPAND)
-        box.Add(self.control, 0, wx.EXPAND)
+        box.AddF(self.control, wx.SizerFlags().Expand().Border(wx.ALL, 10))
         return box
 
     def create_interior_widgets(self, panel):
@@ -96,6 +98,7 @@ class MainWindow(wx.Frame):
         """Creates exterior window components, such as menu and status bar."""
         self.create_menu()
         self.set_title()
+        self.status_bar = self.CreateStatusBar()
 
     def create_menu(self):
         """Creates the main window menu"""
@@ -165,6 +168,7 @@ class MainWindow(wx.Frame):
         del event
         diagram_tree = text2diagram(self.control.GetValue())
         if diagram_tree:
+            self.status_bar.SetStatusText("")
             self.img.SetBackgroundColour(wx.NullColour)
             img = diagram2png(diagram_tree)
             stream = wx.InputStream(cStringIO.StringIO(img))
@@ -173,10 +177,13 @@ class MainWindow(wx.Frame):
         else:
             ## the colour is named 'tomato3' on 
             ## http://web.njit.edu/~kevin/rgb.txt.html
+            self.status_bar.SetStatusText(("Text edition does not evaluate to "
+                                           "a valid seqdiagram"))
             self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
             self.img.Refresh()
 
     def on_save_button(self, event):
+        """Select what to do when the user clicks on the 'Save' button"""
         if not self.already_saved:
             self.on_save_as(event)
         else:
