@@ -3,36 +3,17 @@ Module main
 
 main is the entry point of this application.
 """
-import wx
 import os.path
 import cStringIO
 
 from seqdiag import parser
 from seqdiag.drawer import DiagramDraw
 from seqdiag.builder import ScreenNodeBuilder
+import wx, wx.html
 
 FORMAT = 'PNG'
 ANTIALIAS = False
 FONTPATH = None
-
-def text2diagram(text):
-    """Converts a text to an abstract diagram, which is not yet a
-    representable image"""
-    try:
-        tree = parser.parse_string(text)
-    except parser.ParseException:
-        return None
-    return ScreenNodeBuilder.build(tree)
-
-def diagram2png(diagram):
-    """Converts an abstract diagram into a representable image"""
-    drawer = DiagramDraw(FORMAT, diagram,
-                         font=FONTPATH,
-                         antialias=ANTIALIAS,
-                         transparency=True)
-    drawer.draw()
-    img = drawer.save()
-    return img
 
 class MainWindow(wx.Frame):
     """
@@ -117,8 +98,13 @@ class MainWindow(wx.Frame):
             else:
                 item = file_menu.Append(item_id, label, help_text)
                 self.Bind(wx.EVT_MENU, handler, item)
+        help_menu = wx.Menu()
+        help_item = help_menu.Append(wx.ID_HELP, '&Documentation',
+                'Help on this application')
+        self.Bind(wx.EVT_MENU, self.on_help, help_item)
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, '&File') # Add the file_menu to the MenuBar
+        menu_bar.Append(help_menu, '&Help')
         self.SetMenuBar(menu_bar)  # Add the menu_bar to the Frame
 
     def set_title(self):
@@ -153,10 +139,32 @@ class MainWindow(wx.Frame):
     def on_about(self, event):
         """Handles the event of clicking on the 'About' menu option"""
         del event
-        dialog = wx.MessageDialog(self, 'A sample editor\n'
-            'in wxPython', 'About Sample Editor', wx.OK)
-        dialog.ShowModal()
-        dialog.Destroy()
+        desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's"
+                "simple sequence diagram package, called seqdiag")
+        license = ("Seqdiag GUI is free software; you can redistribute "
+                   "it and/or modify it under the terms of the GNU General "
+                   "Public License as published by the Free Software "
+                   "Foundation; either version 2 of the License, or (at your "
+                   "option) any later version. "
+                   "\n"
+                   "Seqdiag GUI is distributed in the hope that it will be "
+                   "useful, but WITHOUT ANY WARRANTY; without even the implied "
+                   "warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR "
+                   "PURPOSE.  See the GNU General Public License for more "
+                   "details. You should have received a copy of the GNU "
+                   "General Public License along with File Hunter; if not, "
+                   "write to the Free Software Foundation, Inc., 59 Temple "
+                   "Place, Suite 330, Boston, MA  02111-1307  USA")
+        info = wx.AboutDialogInfo()
+        info.SetName('Seqdiag GUI')
+        info.SetVersion('0.1a1')
+        info.SetDescription(desc)
+        info.SetCopyright('(C) 2012 Luis Osa')
+        info.SetWebSite('http://github.com/logc/seqdiag_gui')
+        info.AddDeveloper('Luis Osa')
+        info.AddDocWriter('Luis Osa')
+        info.SetLicence(license)
+        wx.AboutBox(info)
 
     def on_exit(self, event):
         """Exits the main window"""
@@ -182,6 +190,12 @@ class MainWindow(wx.Frame):
             self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
             self.img.Refresh()
 
+    def on_help(self, event):
+        del event
+        doc = DocWindow()
+        doc.ShowModal()
+        doc.Destroy()
+
     def on_save_button(self, event):
         """Select what to do when the user clicks on the 'Save' button"""
         if not self.already_saved:
@@ -204,15 +218,58 @@ class MainWindow(wx.Frame):
         if not self.already_saved:
             self.already_saved = True
 
-
     def on_open(self, event):
         """Opens a text file to edit"""
         del event
         if self.ask_user_for_filename(style=wx.OPEN,
-                                   **self.default_file_dialog_options()):
+                **self.default_file_dialog_options()):
             textfile = open(os.path.join(self.dirname, self.filename), 'r')
             self.control.SetValue(textfile.read())
             textfile.close()
+
+class HtmlWindow(wx.html.HtmlWindow):
+    """HtmlWindow as seen in the WxPython wiki:
+       http://wiki.wxpython.org/wxPython%20by%20Example"""
+
+    def __init__(self, parent, id):
+        wx.html.HtmlWindow.__init__(self,parent, id)
+        if "gtk2" in wx.PlatformInfo:
+            self.SetStandardFonts()
+
+    def OnLinkClicked(self, link):
+        wx.LaunchDefaultBrowser(link.GetHref())
+
+class DocWindow(wx.Dialog):
+    """DocWindow is a dialog that holds documentation about this application"""
+    def __init__(self):
+        wx.Dialog.__init__(self, None, -1,
+                "Seqdiag GUI documentation",
+                style=wx.DEFAULT_DIALOG_STYLE|wx.THICK_FRAME|wx.RESIZE_BORDER|
+                      wx.TAB_TRAVERSAL)
+        hwin = HtmlWindow(self, wx.ID_ANY)
+        aboutText = """<p>Sorry, there is no information about this program. It
+        is running on <b>wxPython</b> and <b>Python</b>.
+        See <a href="http://wiki.wxpython.org">wxPython Wiki</a></p>"""
+        hwin.SetPage(aboutText)
+
+def text2diagram(text):
+    """Converts a text to an abstract diagram, which is not yet a
+    representable image"""
+    try:
+        tree = parser.parse_string(text)
+    except parser.ParseException:
+        return None
+    return ScreenNodeBuilder.build(tree)
+
+def diagram2png(diagram):
+    """Converts an abstract diagram into a representable image"""
+    drawer = DiagramDraw(FORMAT, diagram,
+                         font=FONTPATH,
+                         antialias=ANTIALIAS,
+                         transparency=True)
+    drawer.draw()
+    img = drawer.save()
+    return img
 
 def run():
     """Application entry point"""
