@@ -41,7 +41,7 @@ Create a diagram
 
 Let us start from a clear screen by removing all text in the edition box:
 
-..image:: http://logc.github.com/seqdiag_gui/images/screen-01.png
+.. image:: http://logc.github.com/seqdiag_gui/images/screen-01.png
   :alt: Step 01: cleared up
 
 We can add a message between two entities by writing their names, an arrow that
@@ -50,15 +50,15 @@ message. If the entities were not mentioned yet in the diagram, they are
 created new. Here we create two of them, 'user'  and 'interface'. We then press
 the 'Evaluate' button to show the following diagram:
 
-![Step 02: first
-message](http://logc.github.com/seqdiag_gui/images/screen-02.png)
+.. image:: http://logc.github.com/seqdiag_gui/images/screen-02.png
+   :alt: Step 02: first message
 
 A return value is signaled in the diagram by an arrow flowing back from one
 entity to another. This is written in the edition box simply inverting the
 arrow in a line following the first one:
 
-![Step 03: return
-value](http://logc.github.com/seqdiag_gui/images/screen-03.png)
+.. image:: http://logc.github.com/seqdiag_gui/images/screen-03.png
+   :alt: Step 03: return value
 
 If the second entity needed to call other entities to compute the return value,
 these messages must be listed between the original call and the return value
@@ -66,8 +66,8 @@ call. Here we create a third entity ('handler') and send it a message. We
 obtain a return value in the same line by writing a double arrow in the edition
 box.
 
-![Step 04: nested
-calls](http://logc.github.com/seqdiag_gui/images/screen-04.png)
+.. image:: http://logc.github.com/seqdiag_gui/images/screen-04.png
+   :alt: Step 04: nested calls
 
 When you finish describing the flow of messages that make up your sequence, you
 can save the resulting diagram in a PNG file by pressing the 'Save' button.
@@ -76,8 +76,8 @@ There are many more features in the seqdiag package. You can read up on them in
 [its documentation](http://blockdiag.com/en/seqdiag/index.html) and end up
 producing something like this!
 
-![Step 05: complex
-diagram](http://logc.github.com/seqdiag_gui/images/screen-05.png)
+.. image:: http://logc.github.com/seqdiag_gui/images/screen-05.png
+   :alt: Step 05: complex diagram
 
 
 Un-install
