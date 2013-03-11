@@ -73,7 +73,7 @@ When you finish describing the flow of messages that make up your sequence, you
 can save the resulting diagram in a PNG file by pressing the 'Save' button.
 
 There are many more features in the seqdiag package. You can read up on them in
-[its documentation](http://blockdiag.com/en/seqdiag/index.html) and end up
+`its documentation <http://blockdiag.com/en/seqdiag/index.html>`_ and end up
 producing something like this!
 
 .. image:: http://logc.github.com/seqdiag_gui/images/screen-05.png
@@ -83,9 +83,11 @@ producing something like this!
 Un-install
 ==========
 
-TODO
+You may uninstall the application by simply removing the folder where it was
+installed. No external files remain.
 
 LICENSE
 =======
 
-TBD
+This program is licensed under the GPL license, v3.0. You can read all of its
+Terms and conditions `here <http://www.gnu.org/licenses/gpl.html>`_
