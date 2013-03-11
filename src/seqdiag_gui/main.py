@@ -139,7 +139,7 @@ class MainWindow(wx.Frame):
     def on_about(self, event):
         """Handles the event of clicking on the 'About' menu option"""
         del event
-        desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's"
+        desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's "
                 "simple sequence diagram package, called seqdiag")
         license = ("Seqdiag GUI is free software; you can redistribute "
                    "it and/or modify it under the terms of the GNU General "
@@ -247,10 +247,8 @@ class DocWindow(wx.Dialog):
                 style=wx.DEFAULT_DIALOG_STYLE|wx.THICK_FRAME|wx.RESIZE_BORDER|
                       wx.TAB_TRAVERSAL)
         hwin = HtmlWindow(self, wx.ID_ANY)
-        aboutText = """<p>Sorry, there is no information about this program. It
-        is running on <b>wxPython</b> and <b>Python</b>.
-        See <a href="http://wiki.wxpython.org">wxPython Wiki</a></p>"""
-        hwin.SetPage(aboutText)
+        htmlText = open('var/resources/doc/help_page.html').read()  
+        hwin.SetPage(htmlText)
 
 def text2diagram(text):
     """Converts a text to an abstract diagram, which is not yet a

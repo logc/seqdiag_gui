@@ -1,0 +1,55 @@
+<H1>
+    Seqdiag GUI documentation
+</H1>
+<H2>
+    How to produce sequence diagrams with Seqdiag GUI
+</H2>
+
+<p> This application is based on the package <a
+    href='http://blockdiag.com/en/seqdiag/index.html'>seqdiag</a>, where you
+may find more information. This help is only meant to get you started producing
+sequence diagrams... </p>
+
+<p> The first diagram you see when you start the application is an example of
+how you can define your own diagrams. The syntax is very similar to GraphViz:
+you name a series of entities and link them with arrows either in left-to-right
+direction (<tt>'-&gt;'</tt>) or right-to-left direction (<tt>'&lt;-'</tt>) </p>
+
+<p> In the example there are three entities: browser, webserver and database.
+The first message goes from the browser to the webserver. It has a solid stroke
+because we have written a single '-' in its definition.  The answer from the
+webserver is dashed because we have written two '--' in its definition.  </p>
+
+<p> Both messages can be merged into one single 'get and return' ensemble by
+writing an equals sign ('=') in the first line, and deleting the secon line.
+After editing the text, you have to press the 'Evaluate' button to see the
+changes. Try this now. </p>
+
+<p> If everything went OK, you saw no changes! In case something went bad, you
+will see a red background on the sequence diagram image, and a bad status
+message on the application's status bar. Try to undo your changes; if
+everything fails, you can always re-start the application and start from the
+beginning. </p>
+
+<p> Let us say you want to add a new clarifying label to the response from the
+database. You can do so by changing the line
+<br/> <tt>webserver &lt;-- database;</tt> <br/>
+to the following:
+<br/> <tt>webserver &lt;-- database [label = "1 comment more"];</tt> <br/>
+and pressing the Evaluate button. </p>
+
+<p> Let us also introduce a new entity into the diagram. Locate the line where
+the browser posts a new comment:
+<br/><tt>browser -&gt; webserver [label = "POST /blog/comment"];</tt><br/>
+and add two new lines under it:
+<br/><tt>webserver -&gt; adserver;</tt><br/>
+<br/><tt>webserver &lt;-- adserver [label = 'Lots of ads'];</tt><br/>
+</p>
+
+<p> You may have to resize the window to fit the new image. </p>
+
+<p> When you are happy with your sequence diagram, you may save it by pressing
+the 'Save' button and selecting a directory and filename on your disk. </p>
+
+<p> Happy diagraming! </p>
+
