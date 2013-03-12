@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os.path
-import cStringIO
 
 import wx, wx.html
 
-from seqdiagrams import text2diagram, diagram2png
+import handlers
+import widgets
 
 HELP_PAGE = 'var/resources/doc/help_page.html'
 
@@ -89,29 +89,7 @@ class MainWindow(wx.Frame):
 
     def create_menu(self):
         """Creates the main window menu"""
-        file_menu = wx.Menu()
-        for item_id, label, help_text, handler in \
-            [(wx.ID_ABOUT, '&About', 'Information about this program',
-                self.on_about),
-             (wx.ID_OPEN, '&Open', 'Open a new file', self.on_open),
-             (wx.ID_SAVE, '&Save', 'Save the current file', self.on_save),
-             (wx.ID_SAVEAS, 'Save &As', 'Save the file under a different name',
-                self.on_save_as),
-             (None, None, None, None),
-             (wx.ID_EXIT, 'E&xit', 'Terminate the program', self.on_exit)]:
-            if item_id == None:
-                file_menu.AppendSeparator()
-            else:
-                item = file_menu.Append(item_id, label, help_text)
-                self.Bind(wx.EVT_MENU, handler, item)
-        help_menu = wx.Menu()
-        help_item = help_menu.Append(wx.ID_HELP, '&Documentation',
-                'Help on this application')
-        self.Bind(wx.EVT_MENU, self.on_help, help_item)
-        menu_bar = wx.MenuBar()
-        menu_bar.Append(file_menu, '&File') # Add the file_menu to the MenuBar
-        menu_bar.Append(help_menu, '&Help')
-        self.SetMenuBar(menu_bar)  # Add the menu_bar to the Frame
+        self.SetMenuBar(widgets.build_menubar(self))  # Add the menu_bar to the Frame
 
     def set_title(self):
         """Sets the window title from the edited file"""
@@ -145,32 +123,7 @@ class MainWindow(wx.Frame):
     def on_about(self, event):
         """Handles the event of clicking on the 'About' menu option"""
         del event
-        desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's "
-                "simple sequence diagram package, called seqdiag")
-        license = ("Seqdiag GUI is free software; you can redistribute "
-                   "it and/or modify it under the terms of the GNU General "
-                   "Public License as published by the Free Software "
-                   "Foundation; either version 2 of the License, or (at your "
-                   "option) any later version. "
-                   "\n"
-                   "Seqdiag GUI is distributed in the hope that it will be "
-                   "useful, but WITHOUT ANY WARRANTY; without even the implied "
-                   "warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR "
-                   "PURPOSE.  See the GNU General Public License for more "
-                   "details. You should have received a copy of the GNU "
-                   "General Public License along with File Hunter; if not, "
-                   "write to the Free Software Foundation, Inc., 59 Temple "
-                   "Place, Suite 330, Boston, MA  02111-1307  USA")
-        info = wx.AboutDialogInfo()
-        info.SetName('Seqdiag GUI')
-        info.SetVersion('0.1a1')
-        info.SetDescription(desc)
-        info.SetCopyright('(C) 2012 Luis Osa')
-        info.SetWebSite('http://github.com/logc/seqdiag_gui')
-        info.AddDeveloper('Luis Osa')
-        info.AddDocWriter('Luis Osa')
-        info.SetLicence(license)
-        wx.AboutBox(info)
+        wx.AboutBox(handlers.build_infobox())
 
     def on_exit(self, event):
         """Exits the main window"""
@@ -180,21 +133,7 @@ class MainWindow(wx.Frame):
     def on_edit(self, event):
         """Evaluates the entered text at each edition"""
         del event
-        diagram_tree = text2diagram(self.control.GetValue())
-        if diagram_tree:
-            self.status_bar.SetStatusText("")
-            self.img.SetBackgroundColour(wx.NullColour)
-            img = diagram2png(diagram_tree)
-            stream = wx.InputStream(cStringIO.StringIO(img))
-            png = wx.ImageFromStream(stream)
-            self.img.SetBitmap(png.ConvertToBitmap())
-        else:
-            ## the colour is named 'tomato3' on
-            ## http://web.njit.edu/~kevin/rgb.txt.html
-            self.status_bar.SetStatusText(("Text edition does not evaluate to "
-                                           "a valid seqdiagram"))
-            self.img.SetBackgroundColour(wx.Colour(205, 79, 57))
-            self.img.Refresh()
+        handlers.edit(self)
 
     def on_help(self, event):
         del event
