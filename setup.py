@@ -13,7 +13,7 @@ setup(name='seqdiag_gui',
           ],
       entry_points={
           'console_scripts':[
-              'run=seqdiag_gui.main:run',
+              'seqdiag_gui=seqdiag_gui.main:run',
               ]
           }
       )
