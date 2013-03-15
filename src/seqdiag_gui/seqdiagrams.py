@@ -20,6 +20,7 @@ FORMAT = 'PNG'
 ANTIALIAS = False
 FONTPATH = None
 
+
 def text2diagram(text):
     """Converts a text to an abstract diagram, which is not yet a
     representable image"""
@@ -28,6 +29,7 @@ def text2diagram(text):
     except parser.ParseException:
         return None
     return ScreenNodeBuilder.build(tree)
+
 
 def diagram2png(diagram):
     """Converts an abstract diagram into a representable image"""
@@ -38,4 +40,3 @@ def diagram2png(diagram):
     drawer.draw()
     img = drawer.save()
     return img
-

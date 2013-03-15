@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import cStringIO
 
-from wx import AboutDialogInfo, Colour, InputStream, ImageFromStream, NullColour
+from wx import AboutDialogInfo, Colour, InputStream, ImageFromStream
+from wx import NullColour
 
 from seqdiagrams import text2diagram, diagram2png
 
@@ -34,6 +35,7 @@ Suite 330, Boston, MA  02111-1307 USA")
 
 """
 
+
 def build_infobox():
     """builds an info box to show help"""
     desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's "
@@ -50,6 +52,7 @@ def build_infobox():
     info.SetLicence(license)
     return info
 
+
 def edit(mainwindow):
     """handles an edition in the text control by updating the diagram"""
     diagram_tree = text2diagram(mainwindow.control.GetValue())
@@ -63,7 +66,7 @@ def edit(mainwindow):
     else:
         ## the colour is named 'tomato3' on
         ## http://web.njit.edu/~kevin/rgb.txt.html
-        mainwindow.status_bar.SetStatusText(("Text edition does not evaluate to "
-                                       "a valid seqdiagram"))
+        mainwindow.status_bar.SetStatusText(("Text edition does not evaluate "
+                                             "to a valid seqdiagram"))
         mainwindow.img.SetBackgroundColour(Colour(205, 79, 57))
         mainwindow.img.Refresh()

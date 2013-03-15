@@ -23,6 +23,7 @@ from wx import App
 
 import windows
 
+
 def run():
     """Application entry point"""
     app = App()

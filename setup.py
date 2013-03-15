@@ -6,14 +6,14 @@ setup(name='seqdiag_gui',
       author='Luis Osa',
       author_email='luis.osa.gdc@gmail.com',
       url='https://github.com/logc/seqdiag_gui',
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       packages=['seqdiag_gui'],
       install_requires=[
-          'seqdiag',
-          ],
+          'seqdiag==0.8.2',
+          ## 'wxPython==2.9.4.0',
+      ],
       entry_points={
-          'console_scripts':[
+          'console_scripts': [
               'seqdiag_gui=seqdiag_gui.main:run',
-              ]
-          }
+          ]}
       )
