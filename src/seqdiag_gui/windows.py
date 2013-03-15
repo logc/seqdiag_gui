@@ -14,12 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os.path
 
-import wx, wx.html
+import wx
+import wx.html
 
 import handlers
 import widgets
 
 HELP_PAGE = 'var/resources/doc/help_page.html'
+
 
 class MainWindow(wx.Frame):
     """
@@ -29,7 +31,7 @@ class MainWindow(wx.Frame):
     """
 
     def __init__(self, filename='simple.diag', imgfile='simple.png'):
-        super(MainWindow, self).__init__(None, size=wx.DefaultSize) #(400,200))
+        super(MainWindow, self).__init__(None, size=wx.DefaultSize)
         self.filename = filename
         self.imgfile = imgfile
         self.dirname = '.'
@@ -54,15 +56,18 @@ class MainWindow(wx.Frame):
     def __arrange_boxes(self):
         """Arranges the lower and upper parts of the main window into a
         vertical stack"""
+        proportion = 0
+        text_proportion = 1
         box = wx.BoxSizer(wx.VERTICAL)
-        box.Add(self.img, 0, wx.EXPAND)
+        box.Add(self.img, proportion, wx.EXPAND)
         buttons = wx.BoxSizer(wx.HORIZONTAL)
         buttons.AddStretchSpacer()
-        buttons.Add(self.save_button, 0, wx.ALIGN_LEFT)
-        buttons.Add(self.eval_button, 0, wx.ALIGN_RIGHT)
+        buttons.Add(self.save_button, proportion, wx.ALIGN_LEFT)
+        buttons.Add(self.eval_button, proportion, wx.ALIGN_RIGHT)
         buttons.AddStretchSpacer()
-        box.Add(buttons, 0, wx.EXPAND)
-        box.AddF(self.control, wx.SizerFlags().Expand().Border(wx.ALL, 10))
+        box.Add(buttons, proportion, wx.EXPAND)
+        box.Add((-1, 10))
+        box.Add(self.control, text_proportion, wx.EXPAND | wx.ALL, 10)
         return box
 
     def create_interior_widgets(self, panel):
@@ -70,7 +75,7 @@ class MainWindow(wx.Frame):
         and menu bars."""
         fileh = open(self.filename, 'r')
         self.control = wx.TextCtrl(panel, -1, fileh.read(),
-                                   style=wx.TE_MULTILINE)
+                                   style=wx.TE_MULTILINE | wx.EXPAND)
         png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
         self.width = png.GetWidth()
         self.height = png.GetHeight()
@@ -89,7 +94,7 @@ class MainWindow(wx.Frame):
 
     def create_menu(self):
         """Creates the main window menu"""
-        self.SetMenuBar(widgets.build_menubar(self))  # Add the menu_bar to the Frame
+        self.SetMenuBar(widgets.build_menubar(self))
 
     def set_title(self):
         """Sets the window title from the edited file"""
@@ -112,7 +117,7 @@ class MainWindow(wx.Frame):
             filename_provided_by_user = True
             self.filename = dialog.GetFilename()
             self.dirname = dialog.GetDirectory()
-            self.set_title() # Update the window title with the new filename
+            self.set_title()  # Update the window title with the new filename
         else:
             filename_provided_by_user = False
         dialog.Destroy()
@@ -159,7 +164,7 @@ class MainWindow(wx.Frame):
         """Saves the output graph to a file"""
         del event
         self.img.GetBitmap().ConvertToImage().SaveFile(
-                os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
+            os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
         if not self.already_saved:
             self.already_saved = True
 
@@ -167,30 +172,34 @@ class MainWindow(wx.Frame):
         """Opens a text file to edit"""
         del event
         if self.ask_user_for_filename(style=wx.OPEN,
-                **self.default_file_dialog_options()):
+                                      **self.default_file_dialog_options()):
             textfile = open(os.path.join(self.dirname, self.filename), 'r')
             self.control.SetValue(textfile.read())
             textfile.close()
+
 
 class HtmlWindow(wx.html.HtmlWindow):
     """HtmlWindow as seen in the WxPython wiki:
        http://wiki.wxpython.org/wxPython%20by%20Example"""
 
     def __init__(self, parent, id):
-        wx.html.HtmlWindow.__init__(self,parent, id)
+        wx.html.HtmlWindow.__init__(self, parent, id)
         if "gtk2" in wx.PlatformInfo:
             self.SetStandardFonts()
 
     def OnLinkClicked(self, link):
         wx.LaunchDefaultBrowser(link.GetHref())
 
+
 class DocWindow(wx.Dialog):
     """DocWindow is a dialog that holds documentation about this application"""
     def __init__(self):
         wx.Dialog.__init__(self, None, -1,
-                "Seqdiag GUI documentation",
-                style=wx.DEFAULT_DIALOG_STYLE|wx.THICK_FRAME|wx.RESIZE_BORDER|
-                      wx.TAB_TRAVERSAL)
+                           "Seqdiag GUI documentation",
+                           style=wx.DEFAULT_DIALOG_STYLE |
+                           wx.THICK_FRAME |
+                           wx.RESIZE_BORDER |
+                           wx.TAB_TRAVERSAL)
         hwin = HtmlWindow(self, wx.ID_ANY)
         htmlText = open(HELP_PAGE).read()
         hwin.SetPage(htmlText)
