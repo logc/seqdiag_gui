@@ -12,13 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os.path
-
 import wx
 import wx.html
-
-import handlers
-import widgets
 
 HELP_PAGE = 'var/resources/doc/help_page.html'
 
@@ -37,7 +32,6 @@ class MainWindow(wx.Frame):
         self.dirname = '.'
         self.height = 0
         self.width = 0
-        self.already_saved = False
 
         panel = wx.Panel(self, -1)
         self.status_bar = None
@@ -46,7 +40,6 @@ class MainWindow(wx.Frame):
         self.control = None
         self.img = None
         self.create_interior_widgets(panel)
-        self.create_exterior_widgets()
 
         self.sizer = self.__arrange_boxes()
         panel.SetSizer(self.sizer)
@@ -82,100 +75,7 @@ class MainWindow(wx.Frame):
         self.img = wx.StaticBitmap(panel, -1, png,
                                    (self.width, self.height))
         self.save_button = wx.Button(panel, wx.ID_SAVE)
-        self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
         self.eval_button = wx.Button(panel, label='Evaluate')
-        self.Bind(wx.EVT_BUTTON, self.on_edit, self.eval_button)
-
-    def create_exterior_widgets(self):
-        """Creates exterior window components, such as menu and status bar."""
-        self.create_menu()
-        self.set_title()
-        self.status_bar = self.CreateStatusBar()
-
-    def create_menu(self):
-        """Creates the main window menu"""
-        self.SetMenuBar(widgets.build_menubar(self))
-
-    def set_title(self):
-        """Sets the window title from the edited file"""
-        super(MainWindow, self).SetTitle('Editing %s' % self.filename)
-
-    # Helper methods:
-
-    def default_file_dialog_options(self):
-        """Returns a dictionary with file dialog options that can be
-        used in both the save file dialog as well as in the open file
-        dialog. """
-        return dict(message='Choose a file', defaultDir=self.dirname,
-                    wildcard='*.*')
-
-    def ask_user_for_filename(self, **dialogOptions):
-        """Returns the success of asking the user, through a wx standard
-        dialog, for a new filename to edit"""
-        dialog = wx.FileDialog(self, **dialogOptions)
-        if dialog.ShowModal() == wx.ID_OK:
-            filename_provided_by_user = True
-            self.filename = dialog.GetFilename()
-            self.dirname = dialog.GetDirectory()
-            self.set_title()  # Update the window title with the new filename
-        else:
-            filename_provided_by_user = False
-        dialog.Destroy()
-        return filename_provided_by_user
-
-    # Event handlers:
-
-    def on_about(self, event):
-        """Handles the event of clicking on the 'About' menu option"""
-        del event
-        wx.AboutBox(handlers.build_infobox())
-
-    def on_exit(self, event):
-        """Exits the main window"""
-        del event
-        self.Close()  # Close the main window.
-
-    def on_edit(self, event):
-        """Evaluates the entered text at each edition"""
-        del event
-        handlers.edit(self)
-
-    def on_help(self, event):
-        del event
-        doc = DocWindow()
-        doc.ShowModal()
-        doc.Destroy()
-
-    def on_save_button(self, event):
-        """Select what to do when the user clicks on the 'Save' button"""
-        if not self.already_saved:
-            self.on_save_as(event)
-        else:
-            self.on_save(event)
-
-    def on_save_as(self, event):
-        """Saves the output graph to a file, whose filename must be provided by
-        the user"""
-        if self.ask_user_for_filename(defaultFile=self.imgfile, style=wx.SAVE,
-                                      **self.default_file_dialog_options()):
-            self.on_save(event)
-
-    def on_save(self, event):
-        """Saves the output graph to a file"""
-        del event
-        self.img.GetBitmap().ConvertToImage().SaveFile(
-            os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
-        if not self.already_saved:
-            self.already_saved = True
-
-    def on_open(self, event):
-        """Opens a text file to edit"""
-        del event
-        if self.ask_user_for_filename(style=wx.OPEN,
-                                      **self.default_file_dialog_options()):
-            textfile = open(os.path.join(self.dirname, self.filename), 'r')
-            self.control.SetValue(textfile.read())
-            textfile.close()
 
 
 class HtmlWindow(wx.html.HtmlWindow):

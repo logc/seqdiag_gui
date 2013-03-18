@@ -22,11 +22,11 @@ main is the entry point of this application.
 from wx import App
 
 import windows
+import controllers
 
 
 def run():
     """Application entry point"""
-    app = App()
-    frame = windows.MainWindow()
-    frame.Show()
+    app = App(False)
+    controller = controllers.MainController(app)
     app.MainLoop()
