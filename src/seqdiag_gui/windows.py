@@ -12,10 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import cStringIO
+
 import wx
 import wx.html
 
-HELP_PAGE = 'var/resources/doc/help_page.html'
+import seqdiagrams
+
+HELP_PAGE = "var/resources/doc/help_page.html"
+START_DIAG = """diagram {
+  browser  -> webserver [label = "GET /index.html"];
+  browser <-- webserver;
+  browser  -> webserver [label = "POST /blog/comment"];
+              webserver  -> database [label = "INSERT comment"];
+              webserver <-- database;
+  browser <-- webserver;
+}
+"""
 
 
 class MainWindow(wx.Frame):
@@ -66,16 +79,19 @@ class MainWindow(wx.Frame):
     def create_interior_widgets(self, panel):
         """Creates interior window components, i.e. everything except status
         and menu bars."""
-        fileh = open(self.filename, 'r')
-        self.control = wx.TextCtrl(panel, -1, fileh.read(),
-                                   style=wx.TE_MULTILINE | wx.EXPAND)
-        png = wx.Image(self.imgfile, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.width = png.GetWidth()
-        self.height = png.GetHeight()
-        self.img = wx.StaticBitmap(panel, -1, png,
-                                   (self.width, self.height))
+        self.control = wx.TextCtrl(
+            panel, -1, START_DIAG, style=wx.TE_MULTILINE | wx.EXPAND)
         self.save_button = wx.Button(panel, wx.ID_SAVE)
         self.eval_button = wx.Button(panel, label='Evaluate')
+        ## TODO: refactor into Model method ?
+        png = seqdiagrams.diagram2png(
+            seqdiagrams.text2diagram(self.control.GetValue()))
+        stream = wx.InputStream(cStringIO.StringIO(png))
+        png = wx.ImageFromStream(stream)
+        self.width = png.GetWidth()
+        self.height = png.GetHeight()
+        self.img = wx.StaticBitmap(
+            panel, -1, png.ConvertToBitmap(), (self.width, self.height))
 
 
 class HtmlWindow(wx.html.HtmlWindow):
