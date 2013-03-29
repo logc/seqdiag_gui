@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='seqdiag_gui',
-      version='0.1a1',
+      version='0.1b1',
       description='A graphical user interface to the seqdiag package',
       author='Luis Osa',
       author_email='luis.osa.gdc@gmail.com',
