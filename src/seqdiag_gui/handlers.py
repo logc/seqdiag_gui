@@ -12,6 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+File:
+    handlers.py
+Author:
+    Luis Osa <logc>
+Description:
+    Handler functions for different application events
+"""
 import cStringIO
 
 from wx import AboutDialogInfo, Colour, InputStream, ImageFromStream
@@ -40,16 +48,15 @@ def build_infobox():
     """builds an info box to show help"""
     desc = ("Seqdiag GUI is a a graphic user interface to Takeshi Komiya's "
             "simple sequence diagram package, called seqdiag")
-    license = LICENSE
     info = AboutDialogInfo()
     info.SetName('Seqdiag GUI')
-    info.SetVersion('0.1a1')
+    info.SetVersion('0.1b1')
     info.SetDescription(desc)
     info.SetCopyright('(C) 2013 Luis Osa')
     info.SetWebSite('http://github.com/logc/seqdiag_gui')
     info.AddDeveloper('Luis Osa')
     info.AddDocWriter('Luis Osa')
-    info.SetLicence(license)
+    info.SetLicence(LICENSE)
     return info
 
 
@@ -66,7 +73,7 @@ def edit(mainwindow):
     else:
         ## the colour is named 'tomato3' on
         ## http://web.njit.edu/~kevin/rgb.txt.html
-        mainwindow.status_bar.SetStatusText(("Text edition does not evaluate "
-                                             "to a valid seqdiagram"))
+        mainwindow.status_bar.SetStatusText(
+            "Text edition does not evaluate to a valid sequence diagram")
         mainwindow.img.SetBackgroundColour(Colour(205, 79, 57))
         mainwindow.img.Refresh()
