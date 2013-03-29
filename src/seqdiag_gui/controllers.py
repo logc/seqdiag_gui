@@ -51,15 +51,15 @@ class MainController(object):
     def build_menubar(self):
         """builds a menu bar for the main window"""
         file_menu = wx.Menu()
-        for item_id, label, help_text, handler in \
-                [(wx.ID_ABOUT, '&About', 'Information about this program',
-                    self.on_about),
-                 (wx.ID_OPEN, '&Open', 'Open a new file', self.on_open),
-                 (wx.ID_SAVE, '&Save', 'Save the current file', self.on_save),
-                 (wx.ID_SAVEAS, 'Save &As',
-                     'Save the file under a different name', self.on_save_as),
-                 (None, None, None, None),
-                 (wx.ID_EXIT, 'E&xit', 'Terminate the program', self.on_exit)]:
+        menu_list = [
+            (wx.ID_ABOUT, '&About', 'About this program', self.on_about),
+            (wx.ID_OPEN, '&Open', 'Open a new file', self.on_open),
+            (wx.ID_SAVE, '&Save', 'Save the current file', self.on_save),
+            (wx.ID_SAVEAS, 'Save &As', 'Save under a different name',
+                self.on_save_as),
+            (None, None, None, None),
+            (wx.ID_EXIT, 'E&xit', 'Terminate the program', self.on_exit)]
+        for item_id, label, help_text, handler in menu_list:
             if item_id is None:
                 file_menu.AppendSeparator()
             else:
@@ -90,6 +90,7 @@ class MainController(object):
         handlers.edit(self.main_window)
 
     def on_help(self, event):
+        """Show a documentation window where HTML help is displayed"""
         event.Skip()
         doc = DocWindow()
         doc.ShowModal()
@@ -98,8 +99,10 @@ class MainController(object):
     def on_save_as(self, event):
         """Saves the output graph to a file, whose filename must be provided by
         the user"""
-        if self.ask_user_for_filename(defaultFile=self.imgfile, style=wx.SAVE,
-                                      **self.default_file_dialog_options()):
+        if self.ask_user_for_filename(
+                defaultFile=self.imgfile, style=wx.SAVE,
+                **self.default_file_dialog_options()):
+            self.already_saved = True
             self.on_save(event)
 
     def on_save(self, event):
@@ -110,13 +113,12 @@ class MainController(object):
         else:
             self.main_window.img.GetBitmap().ConvertToImage().SaveFile(
                 os.path.join(self.dirname, self.filename), wx.BITMAP_TYPE_PNG)
-            self.already_saved = True
 
     def on_open(self, event):
         """Opens a text file to edit"""
         event.Skip()
-        if self.ask_user_for_filename(style=wx.OPEN,
-                                      **self.default_file_dialog_options()):
+        if self.ask_user_for_filename(
+                style=wx.OPEN, **self.default_file_dialog_options()):
             textfile = open(os.path.join(self.dirname, self.filename), 'r')
             self.main_window.control.SetValue(textfile.read())
             textfile.close()
@@ -129,7 +131,7 @@ class MainController(object):
             filename_provided_by_user = True
             self.filename = dialog.GetFilename()
             self.dirname = dialog.GetDirectory()
-            self.set_title()  # Update the window title with the new filename
+            self.main_window.SetTitle('Editing {0}'.format(self.filename))
         else:
             filename_provided_by_user = False
         dialog.Destroy()
